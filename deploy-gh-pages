@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [[ -n "$(git rev-list --oneline '^origin/master' HEAD)" ]]; then
+  echo "need to run: git push origin master"
+  exit
+fi
+git fetch
+if [[ -n "$(git log ..origin/master)" ]]; then
+  echo "need to run: git pull origin master"
+  exit
+fi
+
+if [[ -n "$(git log origin/master..)" ]]; then
+  echo "need to run: git push origin master"
+  exit
+fi
+
+git fetch . master:gh-pages
+git push origin gh-pages
