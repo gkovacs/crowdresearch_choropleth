@@ -23084,7 +23084,7 @@ async function main() {
   }
   let country_id_and_num_participants = []
   for (let country_id of Object.keys(country_id_to_num_participants)) {
-    country_id_and_num_participants.push([country_id, country_id_to_num_participants[country_id]])
+    country_id_and_num_participants.push([country_id, Math.log(country_id_to_num_participants[country_id])])
   }
   var series = country_id_and_num_participants;
 
