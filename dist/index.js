@@ -23067,8 +23067,9 @@ for (let country_info of Datamap.prototype.worldTopo.objects.world.geometries) {
 async function main() {
   let data_request = await fetch('CRP_Participants - Countries Final.csv')
   let data_text = await data_request.text()
-  let country_id_and_num_participants = []
+  let country_id_to_num_participants = {}
   for (let [country, count] of __WEBPACK_IMPORTED_MODULE_2_csv_string___default.a.parse(data_text)) {
+    count = parseInt(count)
     if (country_aliases[country]) {
       country = country_aliases[country]
     }
@@ -23076,7 +23077,14 @@ async function main() {
     if (!country_id) {
       console.log(country)
     }
-    country_id_and_num_participants.push([country_id, count])
+    if (!country_id_to_num_participants[country_id]) {
+      country_id_to_num_participants[country_id] = 0
+    }
+    country_id_to_num_participants[country_id] += count
+  }
+  let country_id_and_num_participants = []
+  for (let country_id of Object.keys(country_id_to_num_participants)) {
+    country_id_and_num_participants.push([country_id, country_id_to_num_participants[country_id]])
   }
   var series = country_id_and_num_participants;
 
