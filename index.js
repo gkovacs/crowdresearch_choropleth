@@ -60,7 +60,8 @@ async function main() {
   }
   let country_id_and_num_participants = []
   for (let country_id of Object.keys(country_id_to_num_participants)) {
-    country_id_and_num_participants.push([country_id, Math.log(country_id_to_num_participants[country_id])])
+    let count = country_id_to_num_participants[country_id]
+    country_id_and_num_participants.push([country_id, Math.log(count), count])
   }
   var series = country_id_and_num_participants;
 
@@ -85,8 +86,9 @@ async function main() {
   series.forEach(function(item){ //
       // item example value ["USA", 70]
       var iso = item[0],
-              value = item[1];
-      dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
+          value = item[1],
+          realvalue = item[2];
+      dataset[iso] = { numberOfThings: value, realvalue: realvalue, fillColor: paletteScale(value) };
   });
   // render map
   new Datamap({
@@ -111,7 +113,8 @@ async function main() {
               // tooltip content
               return ['<div class="hoverinfo">',
                   '<strong>', geo.properties.name, '</strong>',
-                  '<br>Count: <strong>', data.numberOfThings, '</strong>',
+                  '<br>Count: <strong>', data.realvalue, '</strong>',
+                  '<br>Log Count: <strong>', data.numberOfThings, '</strong>',
                   '</div>'].join('');
           }
       }
