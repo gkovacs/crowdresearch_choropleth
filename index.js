@@ -76,29 +76,38 @@ async function main() {
   // For this purpose we create palette(using min/max series-value)
   var onlyValues = series.map(function(obj){ return obj[1]; });
   var minValue = Math.min.apply(null, onlyValues),
-          maxValue = Math.max.apply(null, onlyValues);
+  maxValue = Math.max.apply(null, onlyValues);
   // create color palette function
   // color can be whatever you wish
-  var paletteScale = d3.scale.linear()
-          .domain([minValue,maxValue])
-          .range(["#EFEFFF","#02386F"]); // blue color
+  //var paletteScale = d3.scale.linear()
+  //        .domain([minValue,maxValue])
+  //        .range(["#EFEFFF","#02386F"]); // blue color
+  var paletteScale = d3.scale.threshold()
+          .domain([1, 10, 100])
+          .range(["#EFEFFF", "#c6dbef", "#6baed6", "#3182bd"]); // blue color
   // fill dataset in appropriate format
   series.forEach(function(item){ //
       // item example value ["USA", 70]
       var iso = item[0],
           value = item[1],
           realvalue = item[2];
-      dataset[iso] = { numberOfThings: value, realvalue: realvalue, fillColor: paletteScale(value) };
+      dataset[iso] = { numberOfThings: value, realvalue: realvalue}; //, fillColor: paletteScale(realvalue) };
   });
   // render map
-  new Datamap({
+  var map = new Datamap({
       element: document.getElementById('container'),
-      projection: 'mercator', // big world map
+      projection: 'orthographic',//'mercator', // big world map
+      projectionConfig: {
+          rotation: [-60,-30] //EUROPE/ASIA/AFRICA
+          //rotation: [60,-10] // AMERICAS
+        },
       // countries don't listed in dataset will be painted with this color
-      fills: { defaultFill: '#F5F5F5' },
+      fills: { defaultFill: '#F5F5F5',
+               'bubble': '#2a4369'
+             },
       data: dataset,
       geographyConfig: {
-          borderColor: '#DEDEDE',
+          borderColor: '#ABABAB',//'#DEDEDE',
           highlightBorderWidth: 2,
           // don't change color on mouse hover
           highlightFillColor: function(geo) {
@@ -117,8 +126,31 @@ async function main() {
                   '<br>Log Count: <strong>', data.numberOfThings, '</strong>',
                   '</div>'].join('');
           }
+      },
+      bubblesConfig: {
+        borderColor: '#ABABAB',
+        borderWidth: 0.5
       }
   });
+
+  var bubbleData = [];
+
+  for (var key in dataset) {
+      if (dataset.hasOwnProperty(key)) {
+          var area = dataset[key].realvalue;
+          var radius = Math.log(area) * 9; //Math.sqrt(area / Math.PI) * 5;
+          bubbleData.push( { radius: radius, centered: key, fillKey: 'bubble' } );
+      }
+  }
+
+  map.bubbles(bubbleData, {
+  //[
+  //  {centered: 'USA', fillKey: 'Trouble', radius: 46},
+  //], {
+            popupTemplate: function(geography, data) {
+              return '<div class="hoverinfo">Some data about ' + data.centered + '</div>'
+            }
+      });
 }
 
 main()

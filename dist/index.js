@@ -28447,19 +28447,22 @@ async function main() {
   // For this purpose we create palette(using min/max series-value)
   var onlyValues = series.map(function(obj){ return obj[1]; });
   var minValue = Math.min.apply(null, onlyValues),
-          maxValue = Math.max.apply(null, onlyValues);
+  maxValue = Math.max.apply(null, onlyValues);
   // create color palette function
   // color can be whatever you wish
-  var paletteScale = d3.scale.linear()
-          .domain([minValue,maxValue])
-          .range(["#EFEFFF","#02386F"]); // blue color
+  //var paletteScale = d3.scale.linear()
+  //        .domain([minValue,maxValue])
+  //        .range(["#EFEFFF","#02386F"]); // blue color
+  var paletteScale = d3.scale.threshold()
+          .domain([1, 10, 100])
+          .range(["#EFEFFF", "#c6dbef", "#6baed6", "#3182bd"]); // blue color
   // fill dataset in appropriate format
   series.forEach(function(item){ //
       // item example value ["USA", 70]
       var iso = item[0],
           value = item[1],
           realvalue = item[2];
-      dataset[iso] = { numberOfThings: value, realvalue: realvalue, fillColor: paletteScale(value) };
+      dataset[iso] = { numberOfThings: value, realvalue: realvalue, fillColor: paletteScale(realvalue) };
   });
   // render map
   new __WEBPACK_IMPORTED_MODULE_1_datamaps___default.a({
